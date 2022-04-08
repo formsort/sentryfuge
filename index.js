@@ -1,18 +1,27 @@
-const core = require('@actions/core');
-const wait = require('./wait');
-
+const core = require("@actions/core");
+const github = require("@actions/github");
+const {linkifyText} = require("./sentry");
 
 // most @actions toolkit packages have async methods
 async function run() {
   try {
-    const ms = core.getInput('milliseconds');
-    core.info(`Waiting ${ms} milliseconds ...`);
+    const sentryBase = core.getInput("sentry_base");
+    const orgSlug = core.getInput("org_slug");
+    const projectSlugs = new Set(core.getMultilineInput("project_prefixes"));
+    const octokit = github.getOctokit(core.getInput("github_token"));
+    const {context} = github;
+    const {owner, repo} = context.repo;
 
-    core.debug((new Date()).toTimeString()); // debug is only output if you set the secret `ACTIONS_RUNNER_DEBUG` to true
-    await wait(parseInt(ms));
-    core.info((new Date()).toTimeString());
-
-    core.setOutput('time', new Date().toTimeString());
+    const {body, number} = context.payload.pull_request;
+    const newBody = linkifyText(body, sentryBase, orgSlug, projectSlugs);
+    if (newBody != body) {
+      await octokit.rest.pulls.update({
+        owner,
+        repo,
+        pull_number: number,
+        body: newBody,
+      });
+    }
   } catch (error) {
     core.setFailed(error.message);
   }
