@@ -12,15 +12,27 @@ async function run() {
     const {context} = github;
     const {owner, repo} = context.repo;
 
-    const {body, number} = context.payload.pull_request;
+    const {body, number} =
+      context.payload.pull_request || context.payload.issue;
     const newBody = linkifyText(body, sentryBase, orgSlug, projectSlugs);
     if (newBody != body) {
-      await octokit.rest.pulls.update({
+      const payload = {
         owner,
         repo,
-        pull_number: number,
         body: newBody,
-      });
+      };
+
+      if (context.eventName === "pull_request") {
+        await octokit.rest.pulls.update({
+          ...payload,
+          pull_number: number,
+        });
+      } else {
+        await octokit.rest.issues.update({
+          ...payload,
+          issue_number: number,
+        });
+      }
     }
   } catch (error) {
     core.setFailed(error.message);
