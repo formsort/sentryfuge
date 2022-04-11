@@ -1,6 +1,6 @@
 # sentryfuge
 
-[![build status](https://github.com/formsort/sentryfuge/workflows/build/badge.svg)](https://github.com/formsort/sentryfuge/actions/workflows/build.yml)
+[![build](https://github.com/formsort/sentryfuge/actions/workflows/build.yml/badge.svg?branch=main&event=push)](https://github.com/formsort/sentryfuge/actions/workflows/build.yml)
 
 A GitHub Action that automatically links to referenced Sentry issues in issues and PRs
 
