@@ -8306,9 +8306,15 @@ function wrappy (fn, cb) {
 // while not matching something like [FLOW-FE-ABC](https://blah)
 const SENTRY_ISSUE_PARSER = /(?<=\s+|^)([\w-]+)-\w+\b(?![)\]-])/gm;
 
+const uriEscape = (str) => encodeURI(str).replace(/[()]/g, escape);
+const uriComponentEscape = (str) =>
+  encodeURIComponent(str).replace(/[()]/g, escape);
+
 const linkifySentryRef = (issue, sentryBase, orgSlug) => {
-  issue = issue.toUpperCase();
-  return `[${issue}](${sentryBase}organizations/${orgSlug}/issues/?query=${issue})`;
+  issue = uriComponentEscape(issue.toUpperCase());
+  return `[${issue}](${uriEscape(sentryBase)}organizations/${uriComponentEscape(
+    orgSlug,
+  )}/issues/?query=${issue})`;
 };
 
 const linkifyText = (body, sentryBase, orgSlug, prefixes) => {
@@ -8324,6 +8330,8 @@ const linkifyText = (body, sentryBase, orgSlug, prefixes) => {
 };
 
 module.exports = {
+  uriEscape,
+  uriComponentEscape,
   linkifySentryRef,
   linkifyText,
 };
@@ -8514,15 +8522,27 @@ async function run() {
     const {context} = github;
     const {owner, repo} = context.repo;
 
-    const {body, number} = context.payload.pull_request;
+    const {body, number} =
+      context.payload.pull_request || context.payload.issue;
     const newBody = linkifyText(body, sentryBase, orgSlug, projectSlugs);
     if (newBody != body) {
-      await octokit.rest.pulls.update({
+      const payload = {
         owner,
         repo,
-        pull_number: number,
         body: newBody,
-      });
+      };
+
+      if (context.eventName === "pull_request") {
+        await octokit.rest.pulls.update({
+          ...payload,
+          pull_number: number,
+        });
+      } else {
+        await octokit.rest.issues.update({
+          ...payload,
+          pull_number: number,
+        });
+      }
     }
   } catch (error) {
     core.setFailed(error.message);
