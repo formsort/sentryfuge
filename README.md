@@ -24,7 +24,7 @@ jobs:
   linkify_sentry:
     runs-on: ubuntu-latest
     steps:
-      - uses: formsort/sentryfuge@main
+      - uses: formsort/sentryfuge@v1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           org_slug: formsort
