@@ -20,19 +20,6 @@ on:
       - opened
       - edited
 
-name: Auto link Sentry issues
-
-on:
-  issues:
-    types:
-      - opened
-      - edited
-  pull_request:
-    branches: [master]
-    types:
-      - opened
-      - edited
-
 jobs:
   linkify_sentry:
     runs-on: ubuntu-latest
