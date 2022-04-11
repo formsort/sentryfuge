@@ -8540,7 +8540,7 @@ async function run() {
       } else {
         await octokit.rest.issues.update({
           ...payload,
-          pull_number: number,
+          issue_number: number,
         });
       }
     }
