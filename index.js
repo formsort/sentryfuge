@@ -11,13 +11,9 @@ async function run() {
     const octokit = github.getOctokit(core.getInput("github_token"));
     const {context} = github;
     const {owner, repo} = context.repo;
-    const type = context.eventName;
 
     const {body, number} =
-      type === "pull_request"
-        ? context.payload.pull_request
-        : context.payload.issue;
-
+      context.payload.pull_request || context.payload.issue;
     const newBody = linkifyText(body, sentryBase, orgSlug, projectSlugs);
     if (newBody != body) {
       const payload = {
@@ -26,7 +22,7 @@ async function run() {
         body: newBody,
       };
 
-      if (type === "pull_request") {
+      if (context.eventName === "pull_request") {
         await octokit.rest.pulls.update({
           ...payload,
           pull_number: number,
@@ -34,7 +30,7 @@ async function run() {
       } else {
         await octokit.rest.issues.update({
           ...payload,
-          issue_number: number,
+          pull_number: number,
         });
       }
     }
