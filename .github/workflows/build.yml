@@ -1,0 +1,35 @@
+name: "build"
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - "releases/*"
+
+jobs:
+  # unit tests
+  units:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: volta-cli/action@v1
+      - uses: actions/cache@v3
+        id: cache
+        with:
+          path: |
+            **/node_modules
+            **/.jest-cache
+          key: ${{ runner.os }}-yarn-v5-${{ hashFiles('**/package.json', '**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-v5-
+      - name: Install Dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: yarn install --frozen-lockfile --production false
+      - run: yarn build
+      - name: Commit dist back
+        run: |
+          git config user.email "bot@formsort.com" &&
+          git config user.name "formsort-bot" &&
+          git diff --quiet ||
+          git commit -anm 'build: Update dist' &&
+          git push origin HEAD:${{ github.ref }}
