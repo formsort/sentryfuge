@@ -1529,10 +1529,10 @@ expect@^29.2.0:
     jest-message-util "^29.2.0"
     jest-util "^29.2.0"
 
-fast-check@^3.2.0:
-  version "3.2.0"
-  resolved "https://registry.yarnpkg.com/fast-check/-/fast-check-3.2.0.tgz#a1f2848de45a4ea6b4606993022ffde7003aa296"
-  integrity sha512-RH1GMdVeN6Le0B4gI7fz5VZnCgrkREqt4SFMGyFe8v9n06ZuFdR2npxJDl8GUvZQZCq0/mo92JYUZInZnUm0nw==
+fast-check@^3.5.0:
+  version "3.5.0"
+  resolved "https://registry.yarnpkg.com/fast-check/-/fast-check-3.5.0.tgz#5d633f82b35a3d18c76574d3c38526f46a44f9fc"
+  integrity sha512-5Yk9kfPy1DR8+9nl+wgRbXGM+p7e25nDRuZ/4b3TjIaWu53p/KkwS4uyKFc+Ek2Ft5nF40KRCbPYGrWYp0SjPw==
   dependencies:
     pure-rand "^5.0.2"
 
